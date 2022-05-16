@@ -77,14 +77,14 @@ const commands = [{
   description: 'Entfernt den Don aus voice channel ein',
 }]; 
 
-const rest = new REST({ version: '9' }).setToken('OTA3MzMxNjc2NjU1NDc2Nzg3.YYloeQ.MlIg59YOfeLdleYj748ULPzl9qo');
+const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
   try {
     console.log('Started refreshing application (/) commands.');
 
     await rest.put(
-      Routes.applicationGuildCommands('907331676655476787', '847958730192715817'),
+      Routes.applicationGuildCommands('907331676655476787', process.env.GUILD_ID),
       { body: commands },
     );
 
