@@ -11,13 +11,14 @@ const soundPath = path.join(__dirname, 'sounds');
 async function soundSync() {
   return new Promise(resolve => {
     mkdir(soundPath, { recursive: true }, async () => {
-      const abc = await sync('s3://carnagebot-sounds', soundPath);
-      console.log('synced!', abc);
+      await sync('s3://carnagebot-sounds', soundPath);
+      console.log('Sounds synced!');
       resolve();
     });
   });
 }
 
+// sync on startup
 soundSync();
 
 module.exports = {
