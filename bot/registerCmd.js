@@ -2,6 +2,9 @@ const { REST } = require('@discordjs/rest');
 const { Routes, ApplicationCommandOptionType, ChannelType } = require('discord-api-types/v9');
 
 const commands = [{
+  name: 'don-sync',
+  description: 'Synchronisiert die sounds mit dem S3 bucket'
+}, {
   name: 'sound',
   description: 'Spielt sound aus dem soundboard',
   options: [{
@@ -18,9 +21,6 @@ const commands = [{
     name: 'filter',
     description: 'Filter um die Soundliste zu verkürzen',
   }]
-}, {
-  name: 'soundsync',
-  description: 'Synchronisiert die sounds mit dem S3 bucket',
 }, {
   name: 'don-hi',
   description: 'Ladet den Don in den voice channel ein',
