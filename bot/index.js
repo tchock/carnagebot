@@ -27,7 +27,6 @@ client.on('interactionCreate', async interaction => {
         const channel = interaction.options.getChannel('channel');
         interaction.reply({ content: `Channel ${channel.name} beigetreten`, ephemeral: true });
         await voice.connectToChannel(channel);
-        voice.playSoundRandomFromList(['kuckuck', 'morje', 'helge_geil', 'ficker', 'bock', 'astrein']);
         return;
       case 'don-bye':
           interaction.reply({ content: ':wave:', ephemeral: true });
