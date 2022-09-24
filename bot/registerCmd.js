@@ -18,7 +18,7 @@ const commands = [{
     name: 'filter',
     description: 'Filter um die Soundliste zu verkürzen',
   }]
-} {
+}, {
   name: 'soundsync',
   description: 'Synchronisiert die sounds mit dem S3 bucket',
 }, {
