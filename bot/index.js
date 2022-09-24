@@ -1,6 +1,5 @@
 const { Client, Intents, VoiceChannel } = require('discord.js');
-const { createGameGroup } = require('./gameList');
-const { trierInsult } = require('./trier');
+const { soundSync } = require('./soundSync');
 const voice = require('./voice');
 require('./api');
 
@@ -24,55 +23,6 @@ client.on('interactionCreate', async interaction => {
         voice.playSound('schwaeberei');
         await interaction.reply('Meister!'); 
         return;
-      case 'trier': {
-        const user = interaction.options.getMentionable('name');
-        await interaction.reply({
-          content: trierInsult(user.id),
-          allowedMentions: {users: [user.id]},
-        }); 
-        return;
-      }
-      case 'add-to-game': {
-        const gameCode = interaction.options.getString('game-code');
-        const role = interaction.guild.roles.cache.find(role => role.name === `game-${gameCode}`);
-        if (role) {
-          await interaction.member.roles.add(role);
-          await interaction.reply({ content: `Oh, nice. Du magst ${gameCode} mitspielen!`, ephemeral: true });
-        } else {
-          await interaction.reply({ content: `Das Spiel gibt's gar nicht!`, ephemeral: true });
-        }
-        return;
-      }
-      case 'remove-from-game': {
-        const gameCode = interaction.options.getString('game-code');
-        const role = interaction.guild.roles.cache.find(role => role.name === `game-${gameCode}`);
-        if (role) {
-          await interaction.member.roles.remove(role);
-          await interaction.reply({ content: `Oh, schade. Du nicht mehr bei ${gameCode} mitspielen!`, ephemeral: true });
-        } else {
-          await interaction.reply({ content: `Das Spiel gibt's gar nicht!`, ephemeral: true });
-        }
-        return;
-      }
-      case 'create-game-group': {
-        const gameCode = interaction.options.getString('game-code');
-        const fullName = interaction.options.getString('full-name');
-        createGameGroup(interaction.guild, gameCode, fullName);
-        interaction.guild.roles.create({
-          color: 'PURPLE',
-          mentionable: true,
-          name: `game-${gameCode}`,
-          reason: fullName,
-        });
-        interaction.guild.channels.create(`${fullName} (${gameCode})`, {
-          reason: fullName,
-          parent: GAME_CATEGORY,
-          type: 'GUILD_VOICE',
-        });
-  
-        await interaction.reply({ content: `Yeah, es gibt jetzt das game ${fullName} (${gameCode})!`, ephemeral: true });
-        return;
-      }
       case 'don-hi':
         const channel = interaction.options.getChannel('channel');
         interaction.reply({ content: `Channel ${channel.name} beigetreten`, ephemeral: true });
@@ -88,6 +38,10 @@ client.on('interactionCreate', async interaction => {
         const splittedNames = interaction.options.getString('sound_name').split(/\s*\,\s*/);
         splittedNames.reduce((prevSound, soundName) => prevSound.then(() => voice.playSound(soundName)), Promise.resolve()).catch(() => {});
         interaction.reply({ content: 'Sound abgespielt!', ephemeral: true })
+        return;
+      case 'soundsync':
+        soundSync();
+        interaction.reply({ content: 'Sync gestartet!', ephemeral: true })
         return;
       case 'soundlist':
         const filter = interaction.options.getString('filter');
