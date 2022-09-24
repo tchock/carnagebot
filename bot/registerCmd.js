@@ -3,7 +3,7 @@ const { Routes, ApplicationCommandOptionType, ChannelType } = require('discord-a
 
 const commands = [{
   name: 'don-sync',
-  description: 'Synchronisiert die sounds mit dem S3 bucket'
+  description: 'Synchronisiert die sounds mit dem S3 bucket',
 }, {
   name: 'sound',
   description: 'Spielt sound aus dem soundboard',

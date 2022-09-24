@@ -38,7 +38,7 @@ client.on('interactionCreate', async interaction => {
         splittedNames.reduce((prevSound, soundName) => prevSound.then(() => voice.playSound(soundName)), Promise.resolve()).catch(() => {});
         interaction.reply({ content: 'Sound abgespielt!', ephemeral: true })
         return;
-      case 'soundsync':
+      case 'don-sync':
         soundSync();
         interaction.reply({ content: 'Sync gestartet!', ephemeral: true })
         return;
