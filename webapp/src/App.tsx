@@ -1,6 +1,8 @@
-import { styled, createGlobalStyles, css } from 'solid-styled-components'
+import { styled, createGlobalStyles } from 'solid-styled-components'
 import { Accessor, createEffect, createMemo, createSignal, For, onMount } from "solid-js";
 import hotkeys from 'hotkeys-js';
+
+const SERVER_URL = 'http://ec2-3-125-113-118.eu-central-1.compute.amazonaws.com';
 
 const GlobalStyles = () => {
   const Styles = createGlobalStyles`
@@ -72,7 +74,7 @@ const SoundButton = styled.button<{selected: Accessor<boolean>, playing: Accesso
 `;
 
 const SearchInputForm = styled.form`
-  padding: 12px 0;
+  padding: 8px 8px;
   margin-bottom: 8px;
   position: sticky;
   top: 0;
@@ -83,21 +85,23 @@ const SearchInput = styled.input`
   width: 100%;
   border: 0;
   border-radius: 4px;
-  padding: 8px;
-  font-size: 1.2em;
+  padding: 16px;
+  font-size: 1.5em;
   outline: none;
   background-color: rgb(92.7%, 91.8%, 94.8%);
   border: 2px solid rgb(60.4%, 49.8%, 85.1%);
 `;
 
 async function getSounds() {
-  const result = await fetch('http://localhost:4000/sounds');
+  console.log('get me');
+  
+  const result = await fetch(`${SERVER_URL}/sounds`);
   return result.json();
 }
 
 async function playSounds(sounds: string[]) {
   if (sounds.length > 0) {
-    await fetch('http://localhost:4000/play', {
+    await fetch(`${SERVER_URL}/play`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -129,37 +133,44 @@ export function App() {
     return sounds().filter(item => searchTermWords.every(word => item.includes(word)));
   });
 
-  if (window.location.hash) {
-    const authInfo = new URLSearchParams(window.location.hash.substring(1));
-    window.sessionStorage.setItem('access_token', authInfo.get('access_token'));
-  } else if (!window.sessionStorage.getItem('access_token')) {
-    window.location.href = 'https://discord.com/api/oauth2/authorize?response_type=token&client_id=907331676655476787&state=15773059ghq9183habn&scope=identify&redirect_uri=http%3A%2F%2Flocalhost%3A3001';
-  }
+  // if (window.location.hash) {
+  //   const authInfo = new URLSearchParams(window.location.hash.substring(1));
+  //   window.sessionStorage.setItem('access_token', authInfo.get('access_token'));
+  // } else if (!window.sessionStorage.getItem('access_token')) {
+  //   window.location.href = 'https://discord.com/api/oauth2/authorize?response_type=token&client_id=907331676655476787&state=15773059ghq9183habn&scope=identify&redirect_uri=http%3A%2F%2Flocalhost%3A3001';
+  // }
 
-  if (window.sessionStorage.getItem('access_token')) {
+  // if (window.sessionStorage.getItem('access_token')) {
     getSounds().then(apiSounds => {
       setSounds(apiSounds);
     });
-  }
+  // }
 
-  const startPlaying = (soundsToPlay: string[]) => {
+  const startPlaying = async (soundsToPlay: string[]) => {
     setPlaying(true);
     setTimeout(() => setPlaying(false), 200);
-    playSounds(soundsToPlay);
     if (soundsToPlay.length === 1) {
       setSelected(filteredSounds().indexOf(soundsToPlay[0]))
+    }
+    await playSounds(soundsToPlay);
+    if (window.donBotto) {
+      window.donBotto.soundSelected();
     }
   }
 
   const handleInputChange = e => {
     setSearchTerm(e.currentTarget.value)
-    setSelected(null)
+    setSelected(0)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // playSounds(filteredSounds());
   }
+
+  onMount(() => {
+    searchEl.focus();
+  })
 
   hotkeys('ctrl+f, command+f', e => {
     e.preventDefault() 
@@ -187,6 +198,8 @@ export function App() {
   hotkeys('esc', e => {
     e.preventDefault();
     setSelected(null)
+    setSearchTerm('')
+    searchEl.focus();
   });
 
   hotkeys('enter', e => {
@@ -211,8 +224,6 @@ export function App() {
   return (
     <div >
       <GlobalStyles />
-      <Header>Hola!</Header>
-      <Box>
       <SearchInputForm onSubmit={handleSubmit}>
         <SearchInput 
           onInput={handleInputChange} 
@@ -221,16 +232,16 @@ export function App() {
           ref={searchEl}
         />
       </SearchInputForm>
-      <ButtonGrid>
-      <For each={filteredSounds()} fallback={<div>Keine Sounds gefunden</div>}>
-        {(sound, i) => {
-          return <SoundButton class="sound-button" selected={() => selected() === i()} playing={playing} onClick={() => {
-            startPlaying([sound]);
-          }}>{sound.replace(/_/g, ' ')}</SoundButton>;
-        }}
-      </For>
-      
-      </ButtonGrid>
+      <Box>
+        <ButtonGrid>
+          <For each={filteredSounds()} fallback={<div>Keine Sounds gefunden</div>}>
+            {(sound, i) => {
+              return <SoundButton class="sound-button" selected={() => selected() === i()} playing={playing} onClick={() => {
+                startPlaying([sound]);
+              }}>{sound.replace(/_/g, ' ')}</SoundButton>;
+            }}
+          </For>
+        </ButtonGrid>
       </Box>
     </div>
   );
