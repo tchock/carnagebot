@@ -2,7 +2,7 @@ import { styled, createGlobalStyles } from 'solid-styled-components'
 import { Accessor, createEffect, createMemo, createSignal, For, onMount } from "solid-js";
 import hotkeys from 'hotkeys-js';
 
-const SERVER_URL = 'http://ec2-3-125-113-118.eu-central-1.compute.amazonaws.com';
+const SERVER_URL = 'http://ec2-3-125-113-118.eu-central-1.compute.amazonaws.com:4000';
 
 const GlobalStyles = () => {
   const Styles = createGlobalStyles`
